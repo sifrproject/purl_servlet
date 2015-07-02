@@ -28,7 +28,9 @@ import org.apache.http.util.EntityUtils;
  * @authors Vincent Emonet
  */
 public class PurlServlet extends HttpServlet {
-    
+
+    private String uiURL = "http://bioportal.lirmm.fr";
+
     // redirect GET to POST
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -39,8 +41,24 @@ public class PurlServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        response.sendRedirect("http://bioportal.lirmm.fr");
+        String ontologyAcronym = "";
+        String conceptId = "";
 
+        // Extract ontology acronym and concept ID from the path (e.g.: /ontology/STY/T071)
+        Pattern pattern = Pattern.compile("\\/ontology\\/(.*?)(?:\\/(.*))");
+        Matcher matcher = pattern.matcher(request.getPathInfo().toString());
+        if (matcher.find())
+        {
+            ontologyAcronym = matcher.group(1);
+            conceptId = matcher.group(2);
+        } else {
+            ontologyAcronym = "";
+        }
+
+        // Build the URL to the ontology and concept in the bioportal UI
+        String uiLink = uiURL + "/ontologies/" + ontologyAcronym + "?p=classes&conceptid=" + conceptId;
+
+        response.sendRedirect(uiLink);
     }
 
 }
