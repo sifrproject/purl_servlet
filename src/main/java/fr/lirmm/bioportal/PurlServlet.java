@@ -1,4 +1,4 @@
-package org.sifrproject;
+package fr.lirmm.bioportal;
 
 
 import java.io.IOException;
