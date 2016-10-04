@@ -2,6 +2,7 @@ package org.sifrproject;
 
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,10 +37,11 @@ public class PurlServlet extends HttpServlet {
 
         String ontologyAcronym = "";
         String conceptId = "";
+        String urlString = request.getPathInfo();
 
         // Extract ontology acronym and concept ID from the path (e.g.: /ontology/STY/T071)
         Pattern pattern = Pattern.compile("\\/ontology\\/(.*?)(?:\\/(.*))");
-        Matcher matcher = pattern.matcher(request.getPathInfo().toString());
+        Matcher matcher = pattern.matcher(request.getPathInfo());
         if (matcher.find())
         {
             ontologyAcronym = matcher.group(1);
@@ -49,7 +51,8 @@ public class PurlServlet extends HttpServlet {
         }
 
         // Build the URL to the ontology and concept in the bioportal UI
-        String uiLink = uiURL + "/ontologies/" + ontologyAcronym + "?p=classes&conceptid=" + conceptId;
+        String uiLink = uiURL + "/ontologies/" + ontologyAcronym + "?p=classes&conceptid=" + 
+                URLEncoder.encode(request.getRequestURL().toString() , "UTF-8");
 
         response.sendRedirect(uiLink);
     }
