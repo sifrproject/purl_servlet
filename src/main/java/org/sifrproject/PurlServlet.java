@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PurlServlet extends HttpServlet {
 
     private String uiURL = "http://bioportal.lirmm.fr";
+    private String purlUrl = "http://purl.lirmm.fr";
 
     // redirect GET to POST
     @Override
@@ -31,28 +32,32 @@ public class PurlServlet extends HttpServlet {
         doPost(req, resp);
     }
 
-    // POST
+    /**
+     * Get the URL request path and redirect to the class in the BioPortal UI 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         String ontologyAcronym = "";
-        String conceptId = "";
         String urlString = request.getPathInfo();
 
         // Extract ontology acronym and concept ID from the path (e.g.: /ontology/STY/T071)
         Pattern pattern = Pattern.compile("\\/ontology\\/(.*?)(?:\\/(.*))");
-        Matcher matcher = pattern.matcher(request.getPathInfo());
+        Matcher matcher = pattern.matcher(urlString);
         if (matcher.find())
         {
             ontologyAcronym = matcher.group(1);
-            conceptId = matcher.group(2);
+            //conceptId = matcher.group(2);
         } else {
             ontologyAcronym = "";
         }
 
-        // Build the URL to the ontology and concept in the bioportal UI
-        String uiLink = uiURL + "/ontologies/" + ontologyAcronym + "?p=classes&conceptid=" + 
-                URLEncoder.encode(request.getRequestURL().toString() , "UTF-8");
+        // Build the URL to the class in the bioportal UI like this: 
+        // http://bioportal.lirmm.fr/ontologies/$ONT_ACRO/?p=classes&conceptid=$ENCODED("http://purl.lirmm.fr" + conceptPath)
+        String uiLink = uiURL + "/ontologies/" + ontologyAcronym + "?p=classes&conceptid=" + URLEncoder.encode(purlUrl + urlString, "UTF-8");
 
         response.sendRedirect(uiLink);
     }
